@@ -472,3 +472,4 @@ spec:
     name: Confidential Containers Community
     url: https://github.com/confidential-containers
   version: 0.7.0
+  replaces: cc-operator.v0.5.0
