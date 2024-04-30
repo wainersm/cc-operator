@@ -9,8 +9,10 @@
   import_playbook: install_build_deps.yaml
 - name: Install and configure containerd
   import_playbook: install_containerd.yaml
-# TODO: import either containerd or crio 
-#  when: container_runtime is 'containerd'
+  when: container_runtime == "containerd"
+- name: Install and configure cri-o
+  import_playbook: install_crio.yaml
+  when: container_runtime == "crio"
 - name: Install and configure kubeadm
   import_playbook: install_kubeadm.yaml
 - name: Start a local docker registry

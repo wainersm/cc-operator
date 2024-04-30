@@ -13,7 +13,7 @@
     cni_version: "v1.1.1"
     flannel_home: "/opt/flannel"
     flannel_version: "v0.19.1"
-    kubeadm_cri_runtime_socket: "/run/containerd/containerd.sock"
+    kubeadm_cri_runtime_socket: "/run/{{ container_runtime }}/{{ container_runtime }}.sock"
     kubeadm_conf_dir: "/etc/kubeadm"
     kubelet_bin: "/usr/local/bin/kubelet"
     kubelet_service_dir: "/etc/systemd/system/kubelet.service.d"

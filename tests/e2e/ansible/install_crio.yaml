@@ -1,0 +1,44 @@
+# Copyright Confidential Containers Contributors
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Install the cri-o runtime.
+#
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install cri-o from community build on Ubuntu
+      block:
+        - name: Add repo GPG Key
+          apt_key:
+            url: https://pkgs.k8s.io/addons:/cri-o:/stable:/{{ crio_version }}/deb/Release.key
+            keyring: /etc/apt/keyrings/cri-o-apt-keyring.gpg
+        - name: Add repo
+          apt_repository:
+            filename: cri-o.list
+            repo: "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/stable:/{{ crio_version }}/deb/ /"
+        - name: Install the cri-o package
+          package:
+            name: cri-o
+            state: present
+      when: ansible_distribution == "Ubuntu"
+    #
+    # Undo the installation.
+    #
+    #- name: Revert containerd config to defaults
+    #  tags: undo
+    #  block:
+    #    - name: Check containerd is installed
+    #      shell: systemctl list-unit-files | grep containerd
+    #      register: containerd_exist
+    #      ignore_errors: yes
+    #    - name: Re-create containerd config
+    #      shell: containerd config default > /etc/containerd/config.toml
+    #      when: containerd_exist.rc == 0
+    #    - name: Restart containerd service
+    #      service:
+    #        name: containerd
+    #        enabled: yes
+    #        state: restarted
+    #      when: containerd_exist.rc == 0

@@ -13,6 +13,7 @@ script_dir="$(dirname "$(readlink -f "$0")")"
 step_bootstrap_env=0
 step_start_cluster=0
 step_install_operator=0
+container_runtime="containerd"
 runtimeclass=""
 undo="false"
 timeout="false"
@@ -24,7 +25,9 @@ usage() {
 	Important: it will change the system so ensure it is executed in a development
 	environment.
 
-	Use: $0 [-h|--help] [-r RUNTIMECLASS] [-u], where:
+	Use: $0 [-h|--help] [-c CONTAINER_RUNTIME] [-r RUNTIMECLASS] [-u], where:
+	-c CONTAINER_RUNTIME: configure Kubernetes with CONTAINER_RUNTIME. Either 'crio'
+	                      or 'containerd' (default) is allowed.
 	-h | --help : show this usage
 	-r RUNTIMECLASS: configure to use the RUNTIMECLASS (e.g. kata-clh) on
                          the tests. Defaults to "kata-qemu".
@@ -35,8 +38,9 @@ usage() {
 }
 
 parse_args() {
-	while getopts "hr:ut" opt; do
+	while getopts "c:hr:ut" opt; do
 		case $opt in
+			c) container_runtime="$OPTARG";;
 			h) usage && exit 0;;
 			r) runtimeclass="$OPTARG";;
 			u) undo="true";;
@@ -102,7 +106,8 @@ main() {
 	pushd "$script_dir" >/dev/null
 	echo "::info:: Bootstrap the local machine"
 	step_bootstrap_env=1
-	run 10m ansible-playbook -i localhost, -c local --tags untagged ansible/main.yaml
+	run 10m ansible-playbook -e container_runtime="$container_runtime" \
+		-i localhost, -c local --tags untagged ansible/main.yaml
 
 	echo "::info:: Bring up the test cluster"
 	step_start_cluster=1
